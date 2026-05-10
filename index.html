@@ -436,7 +436,7 @@ function ApplyForm() {
       });
 
       if (error) throw error;
-      setRemainingSeats(prev => prev === null ? prev : Math.max(prev - 1, 0));
+      await loadRemainingSeats();
       setSubmitted(true);
     } catch (error) {
       setSubmitError(error?.message || "신청 저장에 실패했습니다. 잠시 후 다시 시도해주세요.");
