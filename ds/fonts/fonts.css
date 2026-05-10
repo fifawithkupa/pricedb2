@@ -1,0 +1,120 @@
+/* ==========================================================================
+   Wanted Design System — Font stack
+   ==========================================================================
+   - Pretendard (LOCAL, all weights, subset+full WOFF2 with WOFF fallback)
+     The primary UI font. Korean + Latin coverage.
+   - Pretendard JP & Wanted Sans Variable load from CDN — NOT uploaded
+     by the brand team. Replace with local copies for offline/production.
+   ========================================================================== */
+
+/* ──────────────────────────────────────────────────────────────────────── */
+/* Pretendard — local, full family (100..900)                               */
+/* unicode-range trick: subset (KO + Latin essentials) loads first; full    */
+/* file fills in extended glyphs. unicode-range is omitted on the full      */
+/* file so it acts as a complete fallback.                                  */
+/* ──────────────────────────────────────────────────────────────────────── */
+
+@font-face {
+  font-family: "Pretendard";
+  font-style: normal;
+  font-weight: 100;
+  font-display: swap;
+  src: url("./Pretendard-Thin.subset.woff2") format("woff2"),
+       url("./Pretendard-Thin.woff2")        format("woff2"),
+       url("./Pretendard-Thin.woff")         format("woff");
+}
+@font-face {
+  font-family: "Pretendard";
+  font-style: normal;
+  font-weight: 200;
+  font-display: swap;
+  src: url("./Pretendard-ExtraLight.subset.woff2") format("woff2"),
+       url("./Pretendard-ExtraLight.woff2")        format("woff2"),
+       url("./Pretendard-ExtraLight.woff")         format("woff");
+}
+@font-face {
+  font-family: "Pretendard";
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url("./Pretendard-Light.subset.woff2") format("woff2"),
+       url("./Pretendard-Light.woff2")        format("woff2"),
+       url("./Pretendard-Light.woff")         format("woff");
+}
+@font-face {
+  font-family: "Pretendard";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("./Pretendard-Regular.subset.woff2") format("woff2"),
+       url("./Pretendard-Regular.woff2")        format("woff2"),
+       url("./Pretendard-Regular.woff")         format("woff");
+}
+@font-face {
+  font-family: "Pretendard";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("./Pretendard-Medium.subset.woff2") format("woff2"),
+       url("./Pretendard-Medium.woff2")        format("woff2"),
+       url("./Pretendard-Medium.woff")         format("woff");
+}
+@font-face {
+  font-family: "Pretendard";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("./Pretendard-SemiBold.subset.woff2") format("woff2"),
+       url("./Pretendard-SemiBold.woff2")        format("woff2"),
+       url("./Pretendard-SemiBold.woff")         format("woff");
+}
+@font-face {
+  font-family: "Pretendard";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("./Pretendard-Bold.subset.woff2") format("woff2"),
+       url("./Pretendard-Bold.woff2")        format("woff2"),
+       url("./Pretendard-Bold.woff")         format("woff");
+}
+@font-face {
+  font-family: "Pretendard";
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("./Pretendard-ExtraBold.subset.woff2") format("woff2"),
+       url("./Pretendard-ExtraBold.woff2")        format("woff2"),
+       url("./Pretendard-ExtraBold.woff")         format("woff");
+}
+@font-face {
+  font-family: "Pretendard";
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url("./Pretendard-Black.subset.woff2") format("woff2"),
+       url("./Pretendard-Black.woff2")        format("woff2"),
+       url("./Pretendard-Black.woff")         format("woff");
+}
+
+/* Variable axis — used when full weight range is wanted in one face */
+@font-face {
+  font-family: "Pretendard Variable";
+  font-style: normal;
+  font-weight: 45 920;
+  font-display: swap;
+  src: url("./PretendardVariable.woff2") format("woff2-variations"),
+       url("./PretendardVariable.woff2") format("woff2"),
+       url("./PretendardVariable.ttf")   format("truetype-variations");
+}
+
+/* ──────────────────────────────────────────────────────────────────────── */
+/* Pretendard JP — Japanese-extended sibling. Not uploaded; load from CDN   */
+/* so designs that explicitly want JP still resolve. Falls back to local    */
+/* Pretendard which already covers KO + Latin.                              */
+/* ──────────────────────────────────────────────────────────────────────── */
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-jp.css");
+
+/* ──────────────────────────────────────────────────────────────────────── */
+/* Wanted Sans Variable — display/brand font. Not uploaded; CDN.            */
+/* ──────────────────────────────────────────────────────────────────────── */
+@import url("https://cdn.jsdelivr.net/gh/wanteddev/wanted-sans@v1.0.3/packages/wanted-sans/fonts/webfonts/variable/split/WantedSansVariable.min.css");
