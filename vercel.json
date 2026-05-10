@@ -1,6 +1,11 @@
 {
-  "framework": null,
-  "installCommand": "",
-  "buildCommand": "mkdir -p dist && cp index.html Landing.html dist/ && cp -R ds dist/ds",
-  "outputDirectory": "dist"
+  "version": 2,
+  "builds": [
+    { "src": "index.html", "use": "@vercel/static" },
+    { "src": "Landing.html", "use": "@vercel/static" },
+    { "src": "ds/**", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/", "dest": "/index.html" }
+  ]
 }
