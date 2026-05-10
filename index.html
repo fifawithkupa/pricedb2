@@ -354,6 +354,57 @@
 <script type="text/babel">
 const { useState, useMemo, useEffect } = React;
 
+const lang = navigator.language?.startsWith('ko') ? 'ko' : 'en';
+
+if (lang === 'en') {
+  document.title = 'pricedb — what did the company next door pay?';
+  const h1 = document.querySelector('.hero h1');
+  if (h1) h1.innerHTML = 'SaaS contracts,<br/>want to know<br/><em>how much</em> others paid?';
+  const bens = document.querySelectorAll('.benefit span:last-child');
+  if (bens[0]) bens[0].innerHTML = 'Limited to <b>50 beta partners</b>';
+  if (bens[1]) bens[1].innerHTML = '<b>6 months free</b> of commission';
+}
+
+const T = {
+  ko: {
+    formTitle: '베타 파트너 신청',
+    seatsLeft: '남은 좌석',
+    name: '이름',
+    company: '회사명',
+    email: '이메일',
+    tools: '주요 사용 SaaS 툴',
+    selectedCount: n => `${n}개 선택됨`,
+    namePlaceholder: '홍길동',
+    companyPlaceholder: '(주)원티드랩',
+    emailPlaceholder: 'name@company.com',
+    chipPlaceholder: '직접 입력 후 Enter',
+    submit: '베타 파트너 신청하기',
+    submitting: '신청 중...',
+    successTitle: '베타 파트너로 참여해주셔서 감사합니다.',
+    successBody: '1일 내로 연락드리겠습니다.',
+    errorFallback: '신청 저장에 실패했습니다. 잠시 후 다시 시도해주세요.',
+  },
+  en: {
+    formTitle: 'Apply for Beta',
+    seatsLeft: 'Seats left',
+    name: 'Name',
+    company: 'Company',
+    email: 'Email',
+    tools: 'SaaS tools you use',
+    selectedCount: n => `${n} selected`,
+    namePlaceholder: 'Jane Smith',
+    companyPlaceholder: 'Acme Corp',
+    emailPlaceholder: 'name@company.com',
+    chipPlaceholder: 'Type and press Enter',
+    submit: 'Apply as Beta Partner',
+    submitting: 'Submitting...',
+    successTitle: 'Thank you for joining as a beta partner.',
+    successBody: "We'll be in touch within a day.",
+    errorFallback: 'Failed to save. Please try again later.',
+  },
+};
+const t = T[lang];
+
 const SUPABASE_URL = "https://xahfpbptldbjidoaoblo.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhhaGZwYnB0bGRiamlkb2FvYmxvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzODM4ODMsImV4cCI6MjA5Mzk1OTg4M30.pkdrwP27xfoqN8SHH_OcXNUqvMxuEiFtw95BBlxG0rA";
 const SUPABASE_TABLE = "beta_partners";
@@ -399,8 +450,8 @@ function ApplyForm() {
   );
   const ready = name.trim() && company.trim() && emailValid && tools.length > 0;
 
-  const toggleTool = (t) => {
-    setTools(prev => prev.includes(t) ? prev.filter(x => x !== t) : [...prev, t]);
+  const toggleTool = (tool) => {
+    setTools(prev => prev.includes(tool) ? prev.filter(x => x !== tool) : [...prev, tool]);
   };
   const addDraft = () => {
     const v = draft.trim();
@@ -421,11 +472,6 @@ function ApplyForm() {
     if (!ready) return;
     setSubmitError("");
 
-    if (!SUPABASE_ANON_KEY) {
-      setSubmitError("Supabase anon public key를 설정해주세요.");
-      return;
-    }
-
     try {
       setSubmitting(true);
       const { error } = await supabaseClient.from(SUPABASE_TABLE).insert({
@@ -439,14 +485,14 @@ function ApplyForm() {
       await loadRemainingSeats();
       setSubmitted(true);
     } catch (error) {
-      setSubmitError(error?.message || "신청 저장에 실패했습니다. 잠시 후 다시 시도해주세요.");
+      setSubmitError(error?.message || t.errorFallback);
       console.error(error);
     } finally {
       setSubmitting(false);
     }
   };
 
-  const suggestions = SAAS_PRESETS.filter(t => !tools.includes(t)).slice(0, 7);
+  const suggestions = SAAS_PRESETS.filter(tool => !tools.includes(tool)).slice(0, 7);
 
   if (submitted) {
     return (
@@ -455,8 +501,8 @@ function ApplyForm() {
           <div className="check-big">
             <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12l5 5 9-11"/></svg>
           </div>
-          <h3>베타 파트너로 참여해주셔서 감사합니다.</h3>
-          <p>1일 내로 연락드리겠습니다.</p>
+          <h3>{t.successTitle}</h3>
+          <p>{t.successBody}</p>
         </div>
       </div>
     );
@@ -465,27 +511,27 @@ function ApplyForm() {
   return (
     <form className="form-card" onSubmit={onSubmit} noValidate>
       <div className="form-head">
-        <div className="title">베타 파트너 신청</div>
+        <div className="title">{t.formTitle}</div>
         <div className="seats">
-          남은 좌석 <span className="num">{remainingSeats ?? "-"}</span> / {TOTAL_SEATS}
+          {t.seatsLeft} <span className="num">{remainingSeats ?? "-"}</span> / {TOTAL_SEATS}
         </div>
       </div>
 
       <div className="field-row">
         <div className="field">
-          <label>이름 <span className="req">*</span></label>
+          <label>{t.name} <span className="req">*</span></label>
           <input
             className="input" type="text"
-            placeholder="홍길동"
+            placeholder={t.namePlaceholder}
             value={name} onChange={e=>setName(e.target.value)}
             autoComplete="name"
           />
         </div>
         <div className="field">
-          <label>회사명 <span className="req">*</span></label>
+          <label>{t.company} <span className="req">*</span></label>
           <input
             className="input" type="text"
-            placeholder="(주)원티드랩"
+            placeholder={t.companyPlaceholder}
             value={company} onChange={e=>setCompany(e.target.value)}
             autoComplete="organization"
           />
@@ -494,11 +540,11 @@ function ApplyForm() {
 
       <div className="field">
         <label>
-          이메일 <span className="req">*</span>
+          {t.email} <span className="req">*</span>
         </label>
         <input
           className="input" type="email"
-          placeholder="name@company.com"
+          placeholder={t.emailPlaceholder}
           value={email} onChange={e=>setEmail(e.target.value)}
           autoComplete="email"
         />
@@ -506,19 +552,19 @@ function ApplyForm() {
 
       <div className="field">
         <label>
-          주요 사용 SaaS 툴 <span className="req">*</span>
-          <span className="helper">{tools.length}개 선택됨</span>
+          {t.tools} <span className="req">*</span>
+          <span className="helper">{t.selectedCount(tools.length)}</span>
         </label>
         <div className="chips">
-          {tools.map(t => (
-            <span key={t} className="chip on" onClick={()=>toggleTool(t)}>
-              {t} <span className="x">×</span>
+          {tools.map(tool => (
+            <span key={tool} className="chip on" onClick={()=>toggleTool(tool)}>
+              {tool} <span className="x">×</span>
             </span>
           ))}
           <span className="chip-add">
             <span style={{opacity: 0.6}}>+</span>
             <input
-              placeholder="직접 입력 후 Enter"
+              placeholder={t.chipPlaceholder}
               value={draft}
               onChange={e=>setDraft(e.target.value)}
               onKeyDown={handleDraftKey}
@@ -528,8 +574,8 @@ function ApplyForm() {
         </div>
         {suggestions.length > 0 && (
           <div className="chips suggestions">
-            {suggestions.map(t => (
-              <span key={t} className="chip" onClick={()=>toggleTool(t)}>+ {t}</span>
+            {suggestions.map(tool => (
+              <span key={tool} className="chip" onClick={()=>toggleTool(tool)}>+ {tool}</span>
             ))}
           </div>
         )}
@@ -538,7 +584,7 @@ function ApplyForm() {
       {submitError && <div className="form-error">{submitError}</div>}
 
       <button className="submit" type="submit" disabled={!ready || submitting}>
-        {submitting ? "신청 중..." : "베타 파트너 신청하기"}
+        {submitting ? t.submitting : t.submit}
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
       </button>
     </form>
