@@ -352,11 +352,13 @@
 </div>
 
 <script type="text/babel">
-const { useState, useMemo } = React;
+const { useState, useMemo, useEffect } = React;
 
 const SUPABASE_URL = "https://xahfpbptldbjidoaoblo.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhhaGZwYnB0bGRiamlkb2FvYmxvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzODM4ODMsImV4cCI6MjA5Mzk1OTg4M30.pkdrwP27xfoqN8SHH_OcXNUqvMxuEiFtw95BBlxG0rA";
 const SUPABASE_TABLE = "beta_partners";
+const TOTAL_SEATS = 50;
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const SAAS_PRESETS = [
   "Slack","Notion","Figma","Linear","Datadog","GitHub",
@@ -372,6 +374,24 @@ function ApplyForm() {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
+  const [remainingSeats, setRemainingSeats] = useState(null);
+
+  const loadRemainingSeats = async () => {
+    const { count, error } = await supabaseClient
+      .from(SUPABASE_TABLE)
+      .select("id", { count: "exact", head: true });
+
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    setRemainingSeats(Math.max(TOTAL_SEATS - (count || 0), 0));
+  };
+
+  useEffect(() => {
+    loadRemainingSeats();
+  }, []);
 
   const emailValid = useMemo(
     () => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email),
@@ -408,8 +428,7 @@ function ApplyForm() {
 
     try {
       setSubmitting(true);
-      const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-      const { error } = await client.from(SUPABASE_TABLE).insert({
+      const { error } = await supabaseClient.from(SUPABASE_TABLE).insert({
         name: name.trim(),
         company: company.trim(),
         email: email.trim(),
@@ -417,6 +436,7 @@ function ApplyForm() {
       });
 
       if (error) throw error;
+      setRemainingSeats(prev => prev === null ? prev : Math.max(prev - 1, 0));
       setSubmitted(true);
     } catch (error) {
       setSubmitError(error?.message || "신청 저장에 실패했습니다. 잠시 후 다시 시도해주세요.");
@@ -446,7 +466,9 @@ function ApplyForm() {
     <form className="form-card" onSubmit={onSubmit} noValidate>
       <div className="form-head">
         <div className="title">베타 파트너 신청</div>
-        <div className="seats">남은 좌석 <span className="num">23</span> / 50</div>
+        <div className="seats">
+          남은 좌석 <span className="num">{remainingSeats ?? "-"}</span> / {TOTAL_SEATS}
+        </div>
       </div>
 
       <div className="field-row">
