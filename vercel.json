@@ -1,5 +1,6 @@
 {
   "framework": null,
-  "outputDirectory": ".",
-  "cleanUrls": true
+  "installCommand": "",
+  "buildCommand": "mkdir -p dist && cp index.html Landing.html dist/ && cp -R ds dist/ds",
+  "outputDirectory": "dist"
 }
